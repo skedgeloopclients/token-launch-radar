@@ -28,7 +28,8 @@
     <div class="hero-copy">
       <div class="eyebrow">THE RADAR</div>
       <h1>Find the protocols<br>before the token.</h1>
-      <p class="lede">Every pre-token protocol in the sealed snapshot, priced from its own comparables and ranked by implied value. Each row carries a concrete farm plan. No names are hand-picked — the same model scores every row.</p>
+      <p class="lede">Every pre-token protocol in the sealed snapshot, priced from comparables learned inside that same snapshot. Rank by implied value, open a protocol to audit the arithmetic, or stress the model in the sandbox. No names are hand-picked.</p>
+      <div class="coverage" id="coverage"></div>
     </div>
     <div class="stats" id="stats"></div>
   </section>
@@ -47,12 +48,23 @@
     <div class="empty" id="empty" hidden>No protocols match these filters.</div>
   </main>
 
+  <section class="sandbox" id="sandbox" hidden></section>
   <section class="method" id="method" hidden></section>
 
   <footer class="foot">
     <span>Launch Radar · comparables from the sealed DefiLlama snapshot</span>
     <span id="footSource">—</span>
   </footer>
+</div>
+
+<!-- Compare tray -->
+<div class="tray" id="tray" aria-hidden="true">
+  <div class="tray-inner">
+    <span class="tray-label">COMPARE</span>
+    <div class="tray-chips" id="trayChips"></div>
+    <button class="tray-go" id="trayGo" disabled>Compare selected →</button>
+    <button class="tray-clear" id="trayClear" aria-label="Clear selection">×</button>
+  </div>
 </div>
 
 <aside class="drawer" id="drawer" aria-hidden="true">

@@ -67,7 +67,7 @@ export const MODEL: ModelConstants = {
   missing_growth_penalty: 0.96,
 };
 
-export const MODEL_VERSION = 'launch-radar-comps-3';
+export const MODEL_VERSION = 'launch-radar-comps-4';
 export const EARLY_ROWS = 300;   // pre-token protocols below the watchlist floor the early radar adds
 export const LIVE_ROWS = 24;     // listed protocols in the separate "market" view
 
