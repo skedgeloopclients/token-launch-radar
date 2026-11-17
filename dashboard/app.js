@@ -31,7 +31,21 @@
     var cm = 1 + M.chain_weight * Math.min(Math.max((row.chains || []).length - 1, 0), 4);
     var tilt = Math.min(4, Math.max(-2, Math.log2(M.discovery_ref_usd / Math.max(row.tvl_usd, 1))));
     var dm = 1 + M.discovery_weight * tilt;
-    return Math.max(1, Math.round(row.tvl_usd * row.comp_multiple * gm * mm * cm * dm));
+    var pm = row.peer_mult == null ? 1 : row.peer_mult;
+    var sm = row.synergy_mult == null ? 1 : row.synergy_mult;
+    var cf = row.confidence == null ? 1 : row.confidence;
+    return Math.max(1, Math.round(row.tvl_usd * row.comp_multiple * gm * mm * cm * dm * pm * sm * cf));
+  }
+
+  // One-line reading of the dominant driver, derived from the same factors.
+  function rationale(r) {
+    var out = [];
+    if (r.change_7d !== null && Math.abs(r.change_7d) >= 5) out.push((r.change_7d > 0 ? 'strong ' : 'weak ') + '7-day momentum');
+    if ((r.peer_mult || 1) >= 1.06) out.push('large for its peer group');
+    if ((r.maturity_mult || 1) >= 1.12) out.push('a long tokenless track record');
+    if ((r.discovery_mult || 1) >= 1.1) out.push('early-scale discovery');
+    if ((r.comp_n || 0) > 0 && (r.comp_multiple || 0) > 0) out.push('category comps of ' + r.comp_multiple.toFixed(2) + '×');
+    return out.length ? out.slice(0, 3).join(', ') : 'at or near the snapshot median on each factor';
   }
 
   var S = { tab: 'board', q: '', cat: 'all', chain: 'all', sort: 'rank', dir: 1, sel: null };
@@ -182,7 +196,8 @@
         esc(r.category || 'uncategorised') + (r.watchlist ? ' &nbsp;·&nbsp; on the watchlist' : ' &nbsp;·&nbsp; early discovery') + '</div>' +
       '<div class="d-val"><div class="d-val-k">IMPLIED VALUE IF ITS RECORD STAYS AS IT IS</div>' +
         '<div class="d-val-v">' + money(r.implied_value_usd) + '</div>' +
-        '<div class="d-val-n">Page recomputation: ' + money(check) + ' from the same snapshot figures</div></div>' +
+        '<div class="d-val-n">Page recomputation: ' + money(check) + ' from the same snapshot figures</div>' +
+        '<div class="d-val-n" style="margin-top:8px;color:var(--amber2)">Signal: ' + esc(rationale(r)) + '</div></div>' +
       '<div class="d-grid">' +
         cell2('TVL', money(r.tvl_usd)) + cell2('7-DAY TVL', pct(r.change_7d)) +
         cell2('TIME WITHOUT TOKEN', age(r.age_days)) + cell2('COMP MULTIPLE', (r.comp_multiple || 0).toFixed(2) + '×') +
@@ -194,6 +209,9 @@
       factor('Tokenless maturity', age(r.age_days) + ' → ' + (r.maturity_mult || 1).toFixed(3) + '×') +
       factor('Chain breadth', (r.chains || []).length + ' chains → ' + (r.chain_mult || 1).toFixed(3) + '×') +
       factor('Discovery tilt', money(r.tvl_usd) + ' TVL → ' + (r.discovery_mult || 1).toFixed(3) + '×') +
+      factor('Peer-relative size', money(r.tvl_usd) + ' against category peers → ' + (r.peer_mult || 1).toFixed(3) + '×') +
+      factor('Growth × tokenless age', pct(r.change_7d) + ' × ' + age(r.age_days) + ' → ' + (r.synergy_mult || 1).toFixed(3) + '×') +
+      factor('Data confidence', (r.confidence || 1) === 1 ? '7-day change reported → 1.000×' : '7-day change unreported → ' + (r.confidence || 1).toFixed(3) + '×') +
       '<div class="d-h">Farm plan — concrete steps, cost and time</div>' +
       '<div class="d-steps">' + (r.farm_steps || []).map(function (s, i) {
         // board.json stores each step as one "… Cost: … . Time: … ." string; split it for display.
@@ -233,8 +251,10 @@
         'growth_mult = 1 + growth/100 × ' + M.growth_weight + '<br>' +
         'maturity = 1 + age_weight × (1 − 2·exp(−days_without_token / ' + M.age_scale_days + '))<br>' +
         'chain = 1 + ' + M.chain_weight + ' × (chains − 1) &nbsp; discovery = 1 + ' + M.discovery_weight + ' × log2(' + money(M.discovery_ref_usd) + ' / tvl)<br>' +
-        'implied = round(base × growth_mult × maturity × chain × discovery)</div>' +
-      '<p>Longer tokenless track records raise credibility with a saturating effect; small protocols get a bounded discovery tilt because the radar exists to find them early. Already-listed protocols are never ranked — they appear in Market comps with the market’s own price.</p>' +
+        'peer = 1 + ' + M.peer_weight + ' × log2(tvl / category-peer-median tvl)<br>' +
+        'synergy = 1 + ' + M.momentum_age_weight + ' × growth/100 × min(2, days/365) &nbsp; confidence = ' + M.missing_growth_penalty + '× if 7d is unreported<br>' +
+        'implied = round(base × growth × maturity × chain × discovery × peer × synergy × confidence)</div>' +
+      '<p>Longer tokenless track records raise credibility with a saturating effect; small protocols get a bounded discovery tilt because the radar exists to find them early. Size relative to pre-token peers and the interaction of momentum with tokenless age are further snapshot-derived signals. An unreported 7-day change takes a small confidence haircut. Already-listed protocols are never ranked — they appear in Market comps with the market’s own price.</p>' +
       '<h3>3 · Coverage and farm plans</h3>' +
       '<p>The board carries all ' + D.watchlist_size + ' watchlist protocols plus ' + D.early_size + ' early pre-token names below the floor, ranked ' +
         D.board_size + ' deep. Every row’s plan is built from its category, chains, TVL and age: a fresh wallet, one tailored on-chain action, a weekly qualifying action, a holding window, a safety check on the official rewards page, and a farm log. Each step states its cash cost and how long it takes.</p>' +

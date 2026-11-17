@@ -46,6 +46,9 @@ export interface ModelConstants {
   chain_weight: number;       // bonus per extra chain, capped
   discovery_weight: number;   // strength of the small-protocol discovery tilt
   discovery_ref_usd: number;  // TVL at which the discovery tilt is neutral
+  peer_weight: number;        // strength of the within-category relative-size signal
+  momentum_age_weight: number;// growth x tokenless-age interaction
+  missing_growth_penalty: number; // confidence haircut when 7d change is absent
 }
 
 export const MODEL: ModelConstants = {
@@ -59,9 +62,12 @@ export const MODEL: ModelConstants = {
   chain_weight: 0.05,
   discovery_weight: 0.11,
   discovery_ref_usd: 50_000_000,
+  peer_weight: 0.06,
+  momentum_age_weight: 0.12,
+  missing_growth_penalty: 0.96,
 };
 
-export const MODEL_VERSION = 'launch-radar-comps-2';
+export const MODEL_VERSION = 'launch-radar-comps-3';
 export const EARLY_ROWS = 240;   // pre-token protocols below the watchlist floor the early radar adds
 export const LIVE_ROWS = 24;     // listed protocols in the separate "market" view
 
@@ -116,6 +122,7 @@ export function isRankable(p: SnapshotProtocol): boolean {
 export interface Comps {
   global_ratio: number;
   categories: Record<string, { ratio: number; n: number }>;
+  peers: Record<string, number>;   // median TVL of pre-token protocols in each category
   listed_count: number;
 }
 
@@ -149,7 +156,18 @@ export function buildComps(snapshot: Snapshot, model: ModelConstants = MODEL): C
       n,
     };
   }
-  return { global_ratio: global, categories, listed_count: listed.length };
+  // Peer size within a category: the median TVL of pre-token protocols in the same category. This is
+  // another figure from the snapshot, so "large for its peer group" is evidence, not a name override.
+  const peerGroups = new Map<string, number[]>();
+  for (const p of snapshot.protocols) {
+    if (!isPreToken(p) || p.category === 'CEX' || p.tvl_usd <= 0) continue;
+    const key = p.category ?? '(uncategorised)';
+    if (!peerGroups.has(key)) peerGroups.set(key, []);
+    peerGroups.get(key)!.push(p.tvl_usd);
+  }
+  const peers: Record<string, number> = {};
+  for (const [key, values] of peerGroups) peers[key] = median(values);
+  return { global_ratio: global, categories, peers, listed_count: listed.length };
 }
 
 /** The components of one protocol's implied value, exposed so the dashboard can show the working. */
@@ -164,6 +182,9 @@ export interface Valuation {
   maturity_mult: number;
   chain_mult: number;
   discovery_mult: number;
+  peer_mult: number;
+  synergy_mult: number;
+  confidence: number;
   age_days: number | null;
 }
 
@@ -194,7 +215,20 @@ export function valueProtocol(
   const tilt = clamp(Math.log2(model.discovery_ref_usd / Math.max(p.tvl_usd, 1)), -2, 4);
   const discoveryMult = 1 + model.discovery_weight * tilt;
 
-  const implied = Math.max(1, Math.round(base * growthMult * maturityMult * chainMult * discoveryMult));
+  // Size relative to pre-token peers in the same category.
+  const peerTvl = comps.peers[key];
+  const peerMult = peerTvl !== undefined
+    ? 1 + model.peer_weight * clamp(Math.log2(Math.max(p.tvl_usd, 1) / peerTvl), -2, 2)
+    : 1;
+  // Momentum matters more on a long tokenless record: the two snapshot signals reinforce each other.
+  const synergyMult = 1 + model.momentum_age_weight * (growthPct / 100) * Math.min(2, ageFor / 365);
+  // An unreported 7-day change is weaker evidence; a small haircut keeps it from outranking a
+  // comparable protocol whose momentum is actually known.
+  const confidence = p.change_7d === null ? model.missing_growth_penalty : 1;
+
+  const implied = Math.max(1, Math.round(
+    base * growthMult * maturityMult * chainMult * discoveryMult * peerMult * synergyMult * confidence,
+  ));
   return {
     implied_usd: implied,
     comp_multiple: comp_mult,
@@ -210,6 +244,9 @@ export function valueProtocol(
     maturity_mult: maturityMult,
     chain_mult: chainMult,
     discovery_mult: discoveryMult,
+    peer_mult: peerMult,
+    synergy_mult: synergyMult,
+    confidence,
     age_days: age,
   };
 }
@@ -240,6 +277,9 @@ export interface BoardRow {
     maturity_mult: number;
     chain_mult: number;
     discovery_mult: number;
+    peer_mult: number;
+    synergy_mult: number;
+    confidence: number;
     age_days: number | null;
   };
   farm_steps: string[];
@@ -275,6 +315,9 @@ export interface RadarRow {
   maturity_mult: number;
   chain_mult: number;
   discovery_mult: number;
+  peer_mult: number;
+  synergy_mult: number;
+  confidence: number;
   watchlist: boolean;
   farm_steps: string[];
 }
@@ -355,6 +398,9 @@ export function buildBoard(snapshot: Snapshot, model: ModelConstants = MODEL): B
       maturity_mult: round5(s.v.maturity_mult),
       chain_mult: round5(s.v.chain_mult),
       discovery_mult: round5(s.v.discovery_mult),
+      peer_mult: round5(s.v.peer_mult),
+      synergy_mult: round5(s.v.synergy_mult),
+      confidence: s.v.confidence,
       age_days: s.v.age_days,
     },
     farm_steps: farmSteps(s.p, s.v.age_days).map(stepText),
@@ -489,6 +535,9 @@ function radarRow(row: BoardRow, watchlist: Set<string>): RadarRow {
     maturity_mult: row.model.maturity_mult,
     chain_mult: row.model.chain_mult,
     discovery_mult: row.model.discovery_mult,
+    peer_mult: row.model.peer_mult,
+    synergy_mult: row.model.synergy_mult,
+    confidence: row.model.confidence,
     watchlist: watchlist.has(row.slug),
     farm_steps: row.farm_steps,
   };
