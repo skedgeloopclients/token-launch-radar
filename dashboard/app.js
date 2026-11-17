@@ -257,7 +257,7 @@
       '<p>Longer tokenless track records raise credibility with a saturating effect; small protocols get a bounded discovery tilt because the radar exists to find them early. Size relative to pre-token peers and the interaction of momentum with tokenless age are further snapshot-derived signals. An unreported 7-day change takes a small confidence haircut. Already-listed protocols are never ranked — they appear in Market comps with the market’s own price.</p>' +
       '<h3>3 · Coverage and farm plans</h3>' +
       '<p>The board carries all ' + D.watchlist_size + ' watchlist protocols plus ' + D.early_size + ' early pre-token names below the floor, ranked ' +
-        D.board_size + ' deep. Every row’s plan is built from its category, chains, TVL and age: a fresh wallet, one tailored on-chain action, a weekly qualifying action, a holding window, a safety check on the official rewards page, and a farm log. Each step states its cash cost and how long it takes.</p>' +
+        D.board_size + ' deep. Every row’s plan is built from its category, chains, TVL and age: a fresh wallet, one tailored on-chain action, a weekly qualifying action, a holding window, a safety check on the official rewards page, a farm log, and a full budget for the window. Each step states its cash cost and how long it takes.</p>' +
       '<h3>4 · Caveat</h3>' +
       '<p>Implied value is this radar’s own claim, not make.fun’s. A record with no token in DefiLlama is not proof no token exists. Nothing here predicts whether or when a launch happens.</p>';
   }

@@ -68,7 +68,7 @@ export const MODEL: ModelConstants = {
 };
 
 export const MODEL_VERSION = 'launch-radar-comps-3';
-export const EARLY_ROWS = 240;   // pre-token protocols below the watchlist floor the early radar adds
+export const EARLY_ROWS = 300;   // pre-token protocols below the watchlist floor the early radar adds
 export const LIVE_ROWS = 24;     // listed protocols in the separate "market" view
 
 /** Why the snapshot is not one this model can score. */
@@ -505,6 +505,11 @@ export function farmSteps(p: SnapshotProtocol, age: number | null): FarmStep[] {
       text: `Log the wallet address, the dates and every transaction hash in a farm sheet so you can repeat the position or unwind it cleanly.`,
       cost: 'no cost beyond the log',
       time: '5 minutes',
+    },
+    {
+      text: `Budget about $${capital} of capital and roughly $${gas + 10} of gas for the whole ${hold}-day window, and never fund more than you can afford to lose.`,
+      cost: `$${capital} capital plus about $${gas + 10} gas in total`,
+      time: `${hold} days plus about 40 minutes of setup`,
     },
   ];
 }

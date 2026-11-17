@@ -13,7 +13,7 @@ button,input,select{font:inherit;color:inherit}
 .app{max-width:1440px;margin:0 auto;padding:0 34px 60px}
 
 /* Masthead */
-.masthead{display:flex;align-items:center;justify-content:space-between;padding:26px 0 22px;border-bottom:1px solid var(--line2)}
+.masthead{display:flex;align-items:center;justify-content:space-between;padding:16px 0 13px;border-bottom:1px solid var(--line2)}
 .brand{display:flex;align-items:center;gap:14px}
 .mark{width:38px;height:38px;border-radius:50%;position:relative;display:block;
   background:conic-gradient(from 210deg,var(--amber) 0deg,transparent 42deg,transparent 318deg,var(--amber) 360deg);
@@ -30,17 +30,17 @@ button,input,select{font:inherit;color:inherit}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}
 
 /* Hero */
-.hero{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:50px;padding:44px 0 40px;align-items:end}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:40px;padding:24px 0 22px;align-items:end}
 .eyebrow{color:var(--amber);font-size:10px;letter-spacing:.28em;font-weight:700;margin-bottom:16px}
-h1{font-size:44px;line-height:1.06;letter-spacing:-.025em;margin:0;font-weight:750}
-.lede{color:var(--muted);max-width:600px;font-size:13.5px;line-height:1.7;margin:18px 0 0}
+h1{font-size:35px;line-height:1.08;letter-spacing:-.025em;margin:0;font-weight:750}
+.lede{color:var(--muted);max-width:600px;font-size:12px;line-height:1.6;margin:10px 0 0}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.stat{background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:10px 14px;position:relative;overflow:hidden}
 .stat:after{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--amber)}
 .stat.teal:after{background:var(--teal)}
 .stat.blue:after{background:var(--blue)}
 .stat-k{font-size:9.5px;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
-.stat-v{font-family:var(--mono);font-size:26px;font-weight:600;margin-top:8px;letter-spacing:-.02em}
+.stat-v{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:4px;letter-spacing:-.02em}
 .stat-n{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* Tabs */
@@ -51,7 +51,7 @@ h1{font-size:44px;line-height:1.06;letter-spacing:-.025em;margin:0;font-weight:7
 .tab.on:after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--amber)}
 
 /* Controls */
-.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:18px 0}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:9px;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
 .field input,.field select{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:9px 11px;min-width:130px;font-size:12px;outline:none}
