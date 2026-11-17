@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch Radar — pre-token protocol valuation</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#board">Skip to the board</a>
+<div class="app">
+  <header class="masthead">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div>
+        <div class="brand-name">LAUNCH<span>RADAR</span></div>
+        <div class="brand-sub">Pre-token protocol valuation desk</div>
+      </div>
+    </div>
+    <div class="mast-meta">
+      <div class="stamp"><span class="stamp-k">SNAPSHOT</span><span id="asof" class="stamp-v">—</span></div>
+      <div class="stamp"><span class="stamp-k">MODEL</span><span id="modelver" class="stamp-v">—</span></div>
+      <div class="stamp live"><span class="dot"></span><span>STATIC · OFFLINE</span></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">THE RADAR</div>
+      <h1>Find the protocols<br>before the token.</h1>
+      <p class="lede">Every pre-token protocol in the sealed snapshot, priced from its own comparables and ranked by implied value. Each row carries a concrete farm plan. No names are hand-picked — the same model scores every row.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Views"></nav>
+
+  <section class="controls" id="controls"></section>
+
+  <main id="board" tabindex="-1">
+    <div class="table-wrap">
+      <table id="grid">
+        <thead id="gridHead"></thead>
+        <tbody id="gridBody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" hidden>No protocols match these filters.</div>
+  </main>
+
+  <section class="method" id="method" hidden></section>
+
+  <footer class="foot">
+    <span>Launch Radar · comparables from the sealed DefiLlama snapshot</span>
+    <span id="footSource">—</span>
+  </footer>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="drawer-close" id="drawerClose" aria-label="Close detail">×</button>
+  <div id="drawerBody"></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
